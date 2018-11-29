@@ -165,6 +165,13 @@ public class GameEngine {
             for (int j = 0; j < GRID_HEIGHT; j++) {
 
                 tiles[i][j] = TileType.SPACE;
+
+//                if (Math.random() > BLACK_HOLE_CHANCE) {
+//                    tiles[i][j] = TileType.BLACK_HOLE;
+//                }   else if(Math.random() > PULSAR_CHANCE) {
+//                    tiles[i][j] = TileType.PULSAR_ACTIVE;
+//                    
+//                }
             }
         }
 
@@ -187,6 +194,8 @@ public class GameEngine {
 //            }
 //        }
 
+       
+       
         tiles[20][8] = TileType.BLACK_HOLE;
         tiles[23][1] = TileType.BLACK_HOLE;
         tiles[3][12] = TileType.BLACK_HOLE;
@@ -266,7 +275,7 @@ public class GameEngine {
 
         Player p = new Player(4, (int) myPoint.getX(), (int) myPoint.getY());
 
-        return p;            //modify to return a Player object
+        return p;          
     }
 
     /**
@@ -279,18 +288,20 @@ public class GameEngine {
      * player position, but could make other changes to the game.
      */
     public void movePlayerLeft() {
-        //current possition of a player => player.getX(), player.getY()
-        //int curPosOfPlayer = player.getX(), player.getSpawns();
-        //current possition of a blackHole =>
         
-//        if(curPosOfPlayer > 0 && curPosOfPlayer <= GRID_WIDTH && curPosOfPlayer <= GRID_HEIGHT) {
-//            player.setPosition(player.getX()-1, player.getY());
-//        }
-        player.setPosition(player.getX()-1, player.getY());
-       // player.SetPosition(Player.getX()-1, )
-//        if(tiles[i][j] == TileType.SPACE) {
-//            
-//        }
+        //can not move left once at the edge
+        //int curPosOfPlayer = spawns.size();
+        int curPosOfPlayerX = player.getX();
+        int curPosOfPlayerY = player.getY();
+              
+        if(curPosOfPlayerX > 0 && curPosOfPlayerY > 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
+
+            if(tiles[curPosOfPlayerX - 1][curPosOfPlayerY] == TileType.SPACE) {
+                player.setPosition(player.getX() - 1, player.getY());
+            }
+           
+        }
+
     }
 
     /**
@@ -303,7 +314,15 @@ public class GameEngine {
      * update the player position, but could make other changes to the game.
      */
     public void movePlayerRight() {
-        player.setPosition(player.getX()+1, player.getY());
+        
+        int curPosOfPlayerX = player.getX();
+        int curPosOfPlayerY = player.getY();
+
+        if (curPosOfPlayerX < GRID_WIDTH -1 && curPosOfPlayerY < GRID_HEIGHT) {
+            if (tiles[curPosOfPlayerX + 1][curPosOfPlayerY] == TileType.SPACE) {
+                player.setPosition(player.getX() + 1, player.getY());
+            }
+        }
     }
 
     /**
@@ -316,7 +335,16 @@ public class GameEngine {
      * position, but could make other changes to the game.
      */
     public void movePlayerUp() {
-        player.setPosition(player.getX(), player.getY()-1);
+        
+        //have problem moving up at left egde of the grid 
+        int curPosOfPlayerX = player.getX();
+        int curPosOfPlayerY = player.getY();
+        
+        if (curPosOfPlayerX > 0 && curPosOfPlayerY > 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
+            if (tiles[curPosOfPlayerX][curPosOfPlayerY - 1] == TileType.SPACE) {
+                player.setPosition(player.getX(), player.getY() - 1);
+            }
+        }
     }
 
     /**
@@ -329,7 +357,15 @@ public class GameEngine {
      * position, but could make other changes to the game.
      */
     public void movePlayerDown() {
-        player.setPosition(player.getX(), player.getY()+1);
+        
+        int curPosOfPlayerX = player.getX();
+        int curPosOfPlayerY = player.getY();
+        
+        //if (curPosOfPlayerX > 0 && curPosOfPlayerY > 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
+            if (tiles[curPosOfPlayerX][curPosOfPlayerY + 1] == TileType.SPACE) {
+                player.setPosition(player.getX(), player.getY() + 1);
+            }
+       // }
     }
 
     /**
@@ -386,9 +422,6 @@ public class GameEngine {
         for (int i = 0; i < arrayOfAsteroid.length; i++) {
             int r = rng.nextInt(spawns.size()); // r is random between 0 and size of spawns
             Point removed = spawns.remove(r);
-            /*int randX = rng.nextInt(GRID_WIDTH); 
-            int randY = rng.nextInt(GRID_HEIGHT);  
-            arrayOfAsteroid[i] = new Asteroid(randX, randY);*/
            arrayOfAsteroid[i] = new Asteroid(removed.x, removed.y);
            //arrayOfAsteroid[i] = new Asteroid(spawns.get(i).x,spawns.get(i).y);
            
