@@ -5,6 +5,7 @@
  */
 package uk.ac.bradford.spacegame;
 
+import com.sun.javafx.scene.traversal.Direction;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
@@ -156,9 +157,6 @@ public class GameEngine {
     private TileType[][] generateLevel() {
 
         TileType[][] tiles = new TileType[GRID_WIDTH][GRID_HEIGHT];
-//        TileType[][] blackHolesTiles = new TileType[GRID_WIDTH][GRID_HEIGHT];
-//        TileType[][] activePulsarsTiles = new TileType[GRID_WIDTH][GRID_HEIGHT];
-//        TileType[][] inactivePulsarsTiles = new TileType[GRID_WIDTH][GRID_HEIGHT];
 
         for (int i = 0; i < GRID_WIDTH; i++) {
 
@@ -170,53 +168,31 @@ public class GameEngine {
                 //int rand = rng.nextInt();
                 if (range < BLACK_HOLE_CHANCE) {
                     tiles[i][j] = TileType.BLACK_HOLE;
-                }   else if(range < PULSAR_CHANCE) {
-                    tiles[i][j] = TileType.PULSAR_ACTIVE;
-                    
-                } //else if (Math.random() > BLACK_HOLE_CHANCE) {tiles[i][j] = TileType.BLACK_HOLE;}
+                }
+
+//                if(range < BLACK_HOLE_CHANCE + PULSAR_CHANCE) {
+//                    tiles[i][j] = TileType.PULSAR_ACTIVE;
+//                }
+//                else if(range < PULSAR_CHANCE) {
+//                    tiles[i][j] = TileType.PULSAR_ACTIVE;
+//                    
+//                } 
+            }
+            for (int j = 0; j < GRID_WIDTH; j += 3) {
+                for (int k = 0; k < GRID_HEIGHT; k += 3) {
+                    double range = Math.random();
+
+                    if (range < PULSAR_CHANCE) {
+                        tiles[j][k] = TileType.PULSAR_INACTIVE;
+                        //tiles[j] = TileType.BLACK_HOLE;    
+                    }
+
+                }
+
             }
         }
 
-//        for (int x = 1; x < GRID_WIDTH; x+=3){
-//            for (int y = 1; y < GRID_HEIGHT; y+=3) {
-//                tiles[x][y] = TileType.BLACK_HOLE;
-//   
-//            }
-//        }
-//        for (int x = 1; x < GRID_WIDTH; x+=8){
-//            for (int y = 1; y < GRID_HEIGHT; y+=8) {
-//              tiles[x][y] = TileType.PULSAR_ACTIVE;
-//   
-//            }
-//        }
-
-//        for (int x = 1; x < GRID_WIDTH; x+=4){
-//            for (int y = 1; y < GRID_HEIGHT; y+=4) {
-//              tiles[i][j] = TileType.PULSAR_INACTIVE;
-//            }
-//        }
-
-       
-       
-//        tiles[20][8] = TileType.BLACK_HOLE;
-//        tiles[23][1] = TileType.BLACK_HOLE;
-//        tiles[3][12] = TileType.BLACK_HOLE;
-//
-//        tiles[5][5] = TileType.PULSAR_ACTIVE;
-//        tiles[20][1] = TileType.PULSAR_ACTIVE;
-//        tiles[20][11] = TileType.PULSAR_ACTIVE;
-//        tiles[0][16] = TileType.PULSAR_ACTIVE;
-//        tiles[1][0] = TileType.PULSAR_ACTIVE;
-//
-//        tiles[1][7] = TileType.PULSAR_INACTIVE;
-//        tiles[0][5] = TileType.PULSAR_INACTIVE;
-//        tiles[10][10] = TileType.PULSAR_INACTIVE;
-//        tiles[11][8] = TileType.PULSAR_INACTIVE;
-//        tiles[10][0] = TileType.PULSAR_INACTIVE;
-//        tiles[23][7] = TileType.PULSAR_INACTIVE;
-//        tiles[21][15] = TileType.PULSAR_INACTIVE;
-
-        return tiles;            //modify this to return a dynamically generated 2D array
+        return tiles;            //modified to return a dynamically generated 2D array
 
     }
 
@@ -275,9 +251,9 @@ public class GameEngine {
         int randXY = rnd.nextInt(spawns.size());
         Point myPoint = spawns.get(randXY);
 
-        Player p = new Player(4, (int) myPoint.getX(), (int) myPoint.getY());
+        Player p = new Player(10, myPoint.x, myPoint.y);
 
-        return p;          
+        return p;
     }
 
     /**
@@ -290,31 +266,31 @@ public class GameEngine {
      * player position, but could make other changes to the game.
      */
     public void movePlayerLeft() {
-         
+
         int curPosOfPlayerX = player.getX();    //current position of player X coordinate
         int curPosOfPlayerY = player.getY();    //current position of player Y coordinate
-        
-        //if player position is equal to the position of an Asteroid
+
+        //if player position is equal to the position of an Asteroid, collect astroid
         for (int i = 0; i < asteroids.length; i++) {
-            if (asteroids[i] == null)
+            if (asteroids[i] == null) {
                 continue;
+            }
             int x = asteroids[i].getX();
             int y = asteroids[i].getY();
-            if(curPosOfPlayerX == x && curPosOfPlayerY == y) {
+            if (curPosOfPlayerX == x && curPosOfPlayerY == y) {
                 asteroids[i] = null;
                 //asteroids[i] = new Asteroid;
                 points++;
             }
-            
+
         }
-        
-        //int curPosOfPlayer = spawns.size();
+
         //make sures player cannot move out of bound      
-        if(curPosOfPlayerX -1 >= 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
+        if (curPosOfPlayerX - 1 >= 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
             //makes sure that player can not move into non space tiles
-            if(tiles[curPosOfPlayerX - 1][curPosOfPlayerY] == TileType.SPACE) {
+            if (tiles[curPosOfPlayerX - 1][curPosOfPlayerY] == TileType.SPACE) {
                 player.setPosition(player.getX() - 1, player.getY());
-            }           
+            }
         }
     }
 
@@ -328,24 +304,26 @@ public class GameEngine {
      * update the player position, but could make other changes to the game.
      */
     public void movePlayerRight() {
-        
+
         int curPosOfPlayerX = player.getX();
         int curPosOfPlayerY = player.getY();
-        
+
         for (int i = 0; i < asteroids.length; i++) {
-            if (asteroids[i] == null)
+            if (asteroids[i] == null) {
                 continue;
+            }
             int x = asteroids[i].getX();
             int y = asteroids[i].getY();
-            if(curPosOfPlayerX == x && curPosOfPlayerY == y) {
+            if (curPosOfPlayerX == x && curPosOfPlayerY == y) {
                 asteroids[i] = null;
                 //asteroids[i] = new Asteroid;
                 points++;
             }
-            
-        }
 
-        if (curPosOfPlayerX < GRID_WIDTH -1 && curPosOfPlayerY < GRID_HEIGHT) {
+        }
+        //make sures player cannot move out of bound to the right  
+        if (curPosOfPlayerX < GRID_WIDTH - 1 && curPosOfPlayerY < GRID_HEIGHT) {
+              //makes sure that player can not move into non space tiles
             if (tiles[curPosOfPlayerX + 1][curPosOfPlayerY] == TileType.SPACE) {
                 player.setPosition(player.getX() + 1, player.getY());
             }
@@ -362,24 +340,24 @@ public class GameEngine {
      * position, but could make other changes to the game.
      */
     public void movePlayerUp() {
-        
-        //have problem moving up at left egde of the grid 
+
         int curPosOfPlayerX = player.getX();
         int curPosOfPlayerY = player.getY();
-        
+
         for (int i = 0; i < asteroids.length; i++) {
-            if (asteroids[i] == null)
+            if (asteroids[i] == null) {
                 continue;
+            }
             int x = asteroids[i].getX();
             int y = asteroids[i].getY();
-            if(curPosOfPlayerX == x && curPosOfPlayerY == y) {
+            if (curPosOfPlayerX == x && curPosOfPlayerY == y) {
                 asteroids[i] = null;
                 //asteroids[i] = new Asteroid;
                 points++;
             }
-            
+
         }
-        
+
         if (curPosOfPlayerY > 0 && curPosOfPlayerX < GRID_WIDTH && curPosOfPlayerY < GRID_HEIGHT) {
             if (tiles[curPosOfPlayerX][curPosOfPlayerY - 1] == TileType.SPACE) {
                 player.setPosition(player.getX(), player.getY() - 1);
@@ -399,20 +377,21 @@ public class GameEngine {
     public void movePlayerDown() {
         int curPosOfPlayerX = player.getX();            //current position of player X coordinate 
         int curPosOfPlayerY = player.getY();            //current position of player Y coordinate 
-        
+
         for (int i = 0; i < asteroids.length; i++) {
-            if (asteroids[i] == null)
+            if (asteroids[i] == null) {
                 continue;
-            int x = asteroids[i].getX();
-            int y = asteroids[i].getY();
-            if(curPosOfPlayerX == x && curPosOfPlayerY == y) {
+            }
+            int x = asteroids[i].getX();                //current position of asteroids X coordinate
+            int y = asteroids[i].getY();                //current position of asteroids Y coordinate
+            if (curPosOfPlayerX == x && curPosOfPlayerY == y) {
                 asteroids[i] = null;
                 //asteroids[i] = new Asteroid;
                 points++;
             }
-            
+
         }
-        if (curPosOfPlayerY +1 < GRID_HEIGHT && curPosOfPlayerX < GRID_WIDTH) {
+        if (curPosOfPlayerY + 1 < GRID_HEIGHT && curPosOfPlayerX < GRID_WIDTH) {
             if (tiles[curPosOfPlayerX][curPosOfPlayerY + 1] == TileType.SPACE) {
                 player.setPosition(player.getX(), player.getY() + 1);
             }
@@ -433,6 +412,75 @@ public class GameEngine {
      */
     private void moveAsteroids() {
 
+        try {
+            for (int i = 0; i < asteroids.length; i++) {
+
+                switch (asteroids[i].getMovementDirection()) {
+                    case NONE:
+                        //asteroids[i].setPosition(spawns.get(i).x, spawns.get(i).y);
+
+                    case UP:
+                        //if asteriod possition is the same as blackhole possition OR if asteroid is out of bound (UP)
+                         
+                        if (tiles[asteroids[i].getX()][(asteroids[i].getY() - 1)] == TileType.BLACK_HOLE  || (asteroids[i].getY()-1) < 0) {
+                            //remove asteroid and spawn a new one at random
+                            asteroids[i] = null;
+                            
+                            int r = rng.nextInt(spawns.size()); // r is random between 0 and size of spawns
+                            Point removed = spawns.remove(r);
+                            asteroids[i] = new Asteroid(removed.x, removed.y);
+                        }else{
+                            
+                        asteroids[i].setPosition(asteroids[i].getX(), (asteroids[i].getY()) - 1);
+                        
+                        }
+                        break;
+                        
+                    case DOWN:
+                        //check asteroid possition 
+                        if((tiles[asteroids[i].getX()][(asteroids[i].getY() + 1)] == TileType.BLACK_HOLE  || (asteroids[i].getY()-1) < 0)) {
+                            //remove asteroid and spawn a new one at random
+                            asteroids[i] = null;
+                            
+                            int r = rng.nextInt(spawns.size()); // r is random between 0 and size of spawns
+                            Point removed = spawns.remove(r);
+                            asteroids[i] = new Asteroid(removed.x, removed.y);
+                        }   else {
+                        asteroids[i].setPosition(asteroids[i].getX(), (asteroids[i].getY()) + 1);
+                        }
+                        break;
+                        
+                    case LEFT:
+                        asteroids[i].setPosition((asteroids[i].getX() - 1), asteroids[i].getY());
+                        break;
+                    case RIGHT:
+                        asteroids[i].setPosition((asteroids[i].getX() + 1), asteroids[i].getY());
+                        break;
+
+                }
+                int x = asteroids[i].getX();                //current position of asteroids X coordinate
+                int y = asteroids[i].getY();
+                 
+//                if (tiles[x][y] == TileType.BLACK_HOLE) {
+//                    //check if asteroid is out of bound 
+//                    //check left
+//                    if (x - 1 >= 0 && x < GRID_WIDTH && x < GRID_HEIGHT) {
+//                        //check out of bound right
+//                        if (x < GRID_WIDTH - 1 && y < GRID_HEIGHT) {
+//                            //check up
+//                            if (y > 0 && x < GRID_WIDTH && y < GRID_HEIGHT) {
+//                                //check down 
+//                                if (y + 1 < GRID_HEIGHT && x < GRID_WIDTH) {
+//
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+            }
+        } catch (Exception e) {
+
+        }
     }
 
     /**
@@ -474,9 +522,8 @@ public class GameEngine {
             int r = rng.nextInt(spawns.size()); // r is random between 0 and size of spawns
             Point removed = spawns.remove(r);
             arrayOfAsteroid[i] = new Asteroid(removed.x, removed.y);
-           //arrayOfAsteroid[i] = new Asteroid(spawns.get(i).x,spawns.get(i).y);
-           
-            
+            //arrayOfAsteroid[i] = new Asteroid(spawns.get(i).x,spawns.get(i).y);
+
         }
         return arrayOfAsteroid;  //modified to return an array of Asteroid objects
     }
@@ -490,13 +537,11 @@ public class GameEngine {
     private void activatePulsars() {
         for (int i = 0; i < GRID_WIDTH; i++) {
             for (int j = 0; j < GRID_HEIGHT; j++) {
-                //if(tiles) {
-                    
-                //}
-               // tiles[i][j] = TileType.PULSAR_ACTIVE;
-                
+                if (tiles[i][j] == TileType.PULSAR_INACTIVE) {
+                    tiles[i][j] = TileType.PULSAR_ACTIVE;
+                }
             }
-            
+
         }
     }
 
@@ -507,7 +552,14 @@ public class GameEngine {
      * active pulsar will now be an inactive pulsar.
      */
     private void deactivatePulsars() {
+        for (int i = 0; i < GRID_WIDTH; i++) {
+            for (int j = 0; j < GRID_HEIGHT; j++) {
+                if (tiles[i][j] == TileType.PULSAR_ACTIVE) {
+                    tiles[i][j] = TileType.PULSAR_INACTIVE;
+                }
+            }
 
+        }
     }
 
     /**
@@ -519,6 +571,43 @@ public class GameEngine {
      * player object to damage the player.
      */
     private void pulsarDamage() {
+        try {
+            //check if tile at the up pos is active pulsar
+            if (tiles[player.getX()][player.getY() - 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+                //player.setPosition(player.getX(), player.getY() + 1); 
+            } //check up left 
+            else if (tiles[player.getX() - 1][player.getY() - 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+            } //check up right
+            else if (tiles[player.getX() + 1][player.getY() - 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            } //check right
+            else if (tiles[player.getX() + 1][player.getY()] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            } //check down right
+            else if (tiles[player.getX() + 1][player.getY() + 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            } //check down 
+            else if (tiles[player.getX()][player.getY() + 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            } //check down left
+            else if (tiles[player.getX() - 1][player.getY() + 1] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            } //check left
+            else if (tiles[player.getX() - 1][player.getY()] == TileType.PULSAR_ACTIVE) {
+                player.changeHullStrength(-1);
+
+            }
+
+        } catch (Exception e) {
+
+        }
 
     }
 
